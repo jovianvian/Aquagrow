@@ -10,6 +10,7 @@ use App\Services\ActiveFarmContext;
 use App\Services\FarmMembershipService;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class FarmAuthorizationTest extends TestCase
@@ -87,6 +88,35 @@ class FarmAuthorizationTest extends TestCase
         $membership = FarmMembership::factory()->create(['farm_id' => $farm->id, 'user_id' => $user->id, 'role' => FarmMembershipRole::FARM_OWNER]);
         $this->expectException(\DomainException::class);
         app(FarmMembershipService::class)->remove($membership);
+    }
+
+    public function test_membership_mutation_waits_for_the_canonical_farm_lock(): void
+    {
+        $farm = Farm::factory()->create();
+        $user = User::factory()->create();
+        $membership = FarmMembership::factory()->create([
+            'farm_id' => $farm->id,
+            'user_id' => $user->id,
+            'role' => FarmMembershipRole::FARM_OWNER,
+        ]);
+
+        config(['database.connections.farm_lock_probe' => config('database.connections.pgsql')]);
+        $lockConnection = DB::connection('farm_lock_probe');
+        $serviceConnection = DB::connection();
+        $serviceConnection->statement('SET lock_timeout TO \'250ms\'');
+        $lockConnection->beginTransaction();
+        $lockConnection->table('farms')->where('id', $farm->id)->lockForUpdate()->first();
+
+        try {
+            $this->expectException(\Throwable::class);
+            app(FarmMembershipService::class)->changeRole($membership, FarmMembershipRole::POND_OPERATOR);
+        } finally {
+            if ($lockConnection->transactionLevel() > 0) {
+                $lockConnection->rollBack();
+            }
+            $serviceConnection->statement('SET lock_timeout TO DEFAULT');
+            DB::purge('farm_lock_probe');
+        }
     }
 
     public function test_stale_session_with_multiple_farms_requires_explicit_selection(): void

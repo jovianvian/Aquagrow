@@ -23,8 +23,11 @@ Scope: Farm and Farm Membership authorization foundation.
 - Non-member farm access: PASS — HTTP 403 Forbidden.
 - Cross-farm isolation: PASS.
 - HTTP 500 on re-test: PASS — not reproduced.
+- Sole-owner account deletion: PASS — deletion was rejected with the policy message; the user remained logged in and the farm membership remained available.
+- Account-deletion rejection produced no HTTP 500, raw database error, or stack trace. Successful deletion was verified only with an automated disposable-account test.
 
 Responsive and keyboard acceptance were not claimed because they were not
 reported as part of the manual evidence. Browser automation remains deferred.
 No manual account identifiers, credentials, cookies, sessions, or sensitive
 user data are stored in this repository.
+Ownership invariant tests must use PostgreSQL and bounded lock timeouts for canonical farm-row locking. Account deletion tests cover sole-owner rejection and successful deletion when every owned farm has another owner.
