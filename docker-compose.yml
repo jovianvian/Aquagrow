@@ -1,0 +1,98 @@
+name: aquagrow
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      args:
+        UID: "${HOST_UID:-1000}"
+        GID: "${HOST_GID:-1000}"
+    image: aquagrow-app:dev
+    env_file: .env
+    networks: [aquagrow-internal]
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    volumes: [".:/var/www/html"]
+    healthcheck:
+      test: ["CMD-SHELL", "php artisan about --only=environment >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    deploy: { resources: { limits: { cpus: "1.0", memory: 512M } } }
+
+  nginx:
+    image: nginx:1.28.0-alpine
+    ports: ["8090:80"]
+    networks: [aquagrow-internal]
+    depends_on: { app: { condition: service_healthy } }
+    volumes:
+      - .:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    networks: [aquagrow-internal]
+    volumes: ["aquagrow_postgres_data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:8.2.1-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    networks: [aquagrow-internal]
+    volumes: ["aquagrow_redis_data:/data"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  queue-worker:
+    image: aquagrow-app:dev
+    env_file: .env
+    command: php artisan queue:work --sleep=3 --tries=3 --timeout=90
+    networks: [aquagrow-internal]
+    depends_on: { app: { condition: service_healthy } }
+    volumes: [".:/var/www/html"]
+    restart: unless-stopped
+
+  scheduler:
+    image: aquagrow-app:dev
+    env_file: .env
+    command: php artisan schedule:work
+    networks: [aquagrow-internal]
+    depends_on: { app: { condition: service_healthy } }
+    volumes: [".:/var/www/html"]
+    restart: unless-stopped
+
+  node:
+    image: node:24.19.0-bookworm-slim
+    working_dir: /var/www/html
+    command: npm run dev -- --host 0.0.0.0
+    ports: ["5174:5173"]
+    networks: [aquagrow-internal]
+    volumes: [".:/var/www/html", "aquagrow_node_modules:/var/www/html/node_modules"]
+    profiles: [frontend]
+
+networks:
+  aquagrow-internal: { name: aquagrow-internal, driver: bridge }
+volumes:
+  aquagrow_postgres_data: { name: aquagrow_postgres_data }
+  aquagrow_redis_data: { name: aquagrow_redis_data }
+  aquagrow_node_modules: { name: aquagrow_node_modules }

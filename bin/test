@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+test_database="aquagrow_testing"
+development_database="$(docker compose exec -T app printenv DB_DATABASE | tr -d '\r')"
+if [[ "$test_database" == "$development_database" ]]; then
+    echo "Refusing to run tests: testing database matches development database." >&2
+    exit 1
+fi
+
+exec docker compose exec -T \
+    -e APP_ENV=testing \
+    -e DB_CONNECTION=pgsql \
+    -e DB_DATABASE="$test_database" \
+    -e CACHE_STORE=array \
+    -e QUEUE_CONNECTION=sync \
+    app php artisan test --no-coverage "$@"

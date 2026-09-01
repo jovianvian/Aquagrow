@@ -1,0 +1,8 @@
+services:
+  app:
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+  postgres:
+    # PostgreSQL remains private by default.
+    ports: []
