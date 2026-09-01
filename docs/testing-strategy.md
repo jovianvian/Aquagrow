@@ -8,3 +8,23 @@ The standard local command is `./bin/test`. It runs PHPUnit inside the app
 container with `APP_ENV=testing`, PostgreSQL database `aquagrow_testing`, and
 an explicit guard that refuses the development database. Browser tests are
 deferred by architecture decision until critical browser journeys exist.
+
+## Manual acceptance record
+
+Date: 2026-09-01 (Asia/Jakarta)
+
+Scope: Farm and Farm Membership authorization foundation.
+
+- User without a farm: PASS — onboarding/empty state displayed.
+- Owner with two farms: PASS — active-farm dashboard displayed.
+- Multi-farm switcher: PASS — switching works.
+- Owner farm settings: PASS — accessible to owner.
+- Dashboard null active-farm regression: PASS — fixed and regression-covered.
+- Non-member farm access: PASS — HTTP 403 Forbidden.
+- Cross-farm isolation: PASS.
+- HTTP 500 on re-test: PASS — not reproduced.
+
+Responsive and keyboard acceptance were not claimed because they were not
+reported as part of the manual evidence. Browser automation remains deferred.
+No manual account identifiers, credentials, cookies, sessions, or sensitive
+user data are stored in this repository.

@@ -35,6 +35,10 @@ docker compose --profile frontend run --rm node npm run build
 
 Domain budidaya, integrasi AI, dan IoT belum termasuk foundation baseline.
 
+Farm pertama dibuat dari dashboard setelah registrasi. Pembuatnya otomatis
+menjadi `FARM_OWNER`; user tanpa farm melihat empty state yang jujur. Farm aktif
+disimpan di session dan selalu diverifikasi terhadap membership user.
+
 <p align="center">
 <a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>

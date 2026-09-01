@@ -18,3 +18,9 @@ erDiagram
   CULTIVATION_CYCLES ||--o{ AI_ANALYSES : analyzes
   AI_ANALYSES ||--o{ AI_ANALYSIS_SOURCES : references
 ```
+# Farm slice
+
+`farms` owns tenant identity (`name`, globally unique `slug`, IANA `timezone`,
+and allowlisted `currency`). `farm_memberships` joins users to farms with an
+enum-backed role and unique `(farm_id, user_id)`. Foreign keys cascade only
+when a farm/user is removed; application policy protects farm operations.

@@ -10,3 +10,9 @@
 | Exports | Unauthorized disclosure | Policy checks and expiring downloads |
 | Secrets | Leakage in Git/logs/images | `.gitignore`, secret scan, redaction, secret manager |
 | Availability | AI/provider outage | Queue failure handling and graceful degradation |
+# Farm authorization additions
+
+- IDOR and cross-farm access are mitigated by explicit membership queries and `FarmPolicy`.
+- Active farm IDs are revalidated against the authenticated user's current memberships on every selection/read.
+- Membership role changes are transactionally locked and preserve the last-owner invariant.
+- Hidden form values are not trusted for tenant or role authorization.

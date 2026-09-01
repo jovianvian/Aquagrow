@@ -81,6 +81,8 @@ class FortifyServiceProvider extends ServiceProvider
             return Limit::perMinute(5)->by($throttleKey);
         });
 
+        RateLimiter::for('farms', fn (Request $request) => Limit::perMinute(10)->by($request->user()?->id ?: $request->ip()));
+
         /* @chisel-passkeys */
         RateLimiter::for('passkeys', function (Request $request) {
             $credentialId = $request->input('credential.id');
