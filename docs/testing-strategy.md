@@ -30,4 +30,9 @@ Responsive and keyboard acceptance were not claimed because they were not
 reported as part of the manual evidence. Browser automation remains deferred.
 No manual account identifiers, credentials, cookies, sessions, or sensitive
 user data are stored in this repository.
+
+Location and pond tests use PostgreSQL integration behavior for tenant-scoped
+queries, enum/positive-value checks, farm-local codes, and the composite
+farm/location foreign key. Manual acceptance must cover owner CRUD, operator
+read-only behavior, farm switching, responsive layout, and keyboard operation.
 Ownership invariant tests must use PostgreSQL and bounded lock timeouts for canonical farm-row locking. Account deletion tests cover sole-owner rejection and successful deletion when every owned farm has another owner.

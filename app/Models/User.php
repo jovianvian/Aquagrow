@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -47,6 +48,12 @@ class User extends Authenticatable implements PasskeyUser
     public function farmMemberships(): HasMany
     {
         return $this->hasMany(FarmMembership::class);
+    }
+
+    /** @return HasManyThrough<Location, Farm, $this> */
+    public function locations(): HasManyThrough
+    {
+        return $this->hasManyThrough(Location::class, Farm::class);
     }
 
     /**

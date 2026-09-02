@@ -48,6 +48,15 @@ disimpan di session dan selalu diverifikasi terhadap membership user.
 
 ## About Laravel
 
+## Location and pond workspace
+
+With an active farm selected, owners can create and update locations and ponds.
+Operators can view them read-only. Pond codes are unique within a farm, and
+pond/location relationships are protected by a PostgreSQL composite constraint.
+Measurements are optional canonical metric values: dimensions in meters, water
+volume in liters, and capacity as a positive fish count. Pond deletion and
+cultivation data are not included yet.
+
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
 - [Simple, fast routing engine](https://laravel.com/docs/routing).

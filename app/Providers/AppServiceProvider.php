@@ -3,7 +3,11 @@
 namespace App\Providers;
 
 use App\Models\Farm;
+use App\Models\Location;
+use App\Models\Pond;
 use App\Policies\FarmPolicy;
+use App\Policies\LocationPolicy;
+use App\Policies\PondPolicy;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -26,6 +30,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::policy(Location::class, LocationPolicy::class);
+        Gate::policy(Pond::class, PondPolicy::class);
         $this->configureDefaults();
         Gate::policy(Farm::class, FarmPolicy::class);
     }
