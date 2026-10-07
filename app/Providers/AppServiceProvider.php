@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\CultivationCycle;
 use App\Models\Farm;
 use App\Models\Location;
 use App\Models\Pond;
+use App\Policies\CultivationCyclePolicy;
 use App\Policies\FarmPolicy;
 use App\Policies\LocationPolicy;
 use App\Policies\PondPolicy;
@@ -30,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::policy(CultivationCycle::class, CultivationCyclePolicy::class);
         Gate::policy(Location::class, LocationPolicy::class);
         Gate::policy(Pond::class, PondPolicy::class);
         $this->configureDefaults();

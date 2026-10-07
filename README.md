@@ -33,7 +33,9 @@ docker compose --profile frontend run --rm node npm ci
 docker compose --profile frontend run --rm node npm run build
 ```
 
-Domain budidaya, integrasi AI, dan IoT belum termasuk foundation baseline.
+Cycle planning and stocking foundation is available after a farm, location, and
+pond are configured. The current slice supports planned, active, and cancelled
+cycles; completion/harvest, monitoring, AI, and IoT remain deferred.
 
 Farm pertama dibuat dari dashboard setelah registrasi. Pembuatnya otomatis
 menjadi `FARM_OWNER`; user tanpa farm melihat empty state yang jujur. Farm aktif
@@ -54,8 +56,9 @@ With an active farm selected, owners can create and update locations and ponds.
 Operators can view them read-only. Pond codes are unique within a farm, and
 pond/location relationships are protected by a PostgreSQL composite constraint.
 Measurements are optional canonical metric values: dimensions in meters, water
-volume in liters, and capacity as a positive fish count. Pond deletion and
-cultivation data are not included yet.
+volume in liters, and capacity as a positive fish count. Pond deletion is not
+exposed. Cultivation cycles use farm-local batch codes, allow one planned or
+active cycle per pond, and keep operators read-only.
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 

@@ -4,6 +4,7 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Features;
 use Tests\TestCase;
 
@@ -45,6 +46,41 @@ class AuthenticationTest extends TestCase
 
         $response->assertSessionHasErrorsIn('email');
 
+        $this->assertGuest();
+    }
+
+    public function test_users_can_be_remembered_after_their_session_is_cleared(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+            'remember' => true,
+        ]);
+
+        $recallerName = Auth::getRecallerName();
+        $recaller = $response->getCookie($recallerName, false);
+
+        $this->assertNotNull($recaller);
+
+        $this->flushSession();
+        Auth::forgetGuards();
+
+        $this->get(route('dashboard'))
+            ->assertRedirect(route('login'));
+        $this->assertGuest();
+
+        Auth::forgetGuards();
+
+        $this->withUnencryptedCookie($recallerName, $recaller->getValue())
+            ->get(route('dashboard'))
+            ->assertOk();
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertTrue(Auth::viaRemember());
+
+        $this->post(route('logout'))->assertRedirect(route('home'));
         $this->assertGuest();
     }
 

@@ -23,16 +23,160 @@
     --color-zinc-900: #171717;
     --color-zinc-950: #0a0a0a;
 
-    --color-accent: var(--color-neutral-800);
-    --color-accent-content: var(--color-neutral-800);
+    --color-accent: #0f766e;
+    --color-accent-content: #115e59;
     --color-accent-foreground: var(--color-white);
 }
 
 @layer theme {
     .dark {
-        --color-accent: var(--color-white);
-        --color-accent-content: var(--color-white);
-        --color-accent-foreground: var(--color-neutral-800);
+        --color-accent: #2dd4bf;
+        --color-accent-content: #99f6e4;
+        --color-accent-foreground: #042f2e;
+    }
+}
+
+@layer components {
+    html:has(body.ag-landing) {
+        --ag-landing-nav-offset: 4.25rem;
+        scroll-behavior: smooth;
+        scroll-padding-top: var(--ag-landing-nav-offset);
+    }
+
+    @media (max-width: 767px) {
+        html:has(body.ag-landing) {
+            --ag-landing-nav-offset: 7.1rem;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        html:has(body.ag-landing) {
+            scroll-behavior: auto;
+        }
+    }
+
+    .ag-page {
+        @apply mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8;
+    }
+
+    .ag-panel {
+        @apply rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-900;
+    }
+
+    .ag-field {
+        @apply block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 shadow-sm transition-colors placeholder:text-zinc-400 hover:border-zinc-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/25 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:border-zinc-500 dark:focus:border-teal-400 dark:focus:ring-teal-400/25;
+    }
+
+    .ag-label {
+        @apply mb-1.5 block text-sm font-medium text-zinc-800 dark:text-zinc-100;
+    }
+
+    .ag-help {
+        @apply mt-1 text-xs text-zinc-500 dark:text-zinc-400;
+    }
+
+    .ag-alert-success {
+        @apply rounded-xl border border-emerald-700 bg-emerald-50 px-4 py-3 text-sm text-emerald-950 dark:border-emerald-500 dark:bg-emerald-950/40 dark:text-emerald-100;
+    }
+
+    .ag-alert-error {
+        @apply rounded-xl border border-rose-700 bg-rose-50 px-4 py-3 text-sm text-rose-950 dark:border-rose-500 dark:bg-rose-950/40 dark:text-rose-100;
+    }
+
+    .ag-status {
+        @apply inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-wide;
+    }
+
+    .ag-landing {
+        --ag-landing-bg: #f5fbf9;
+        --ag-landing-surface: #ffffff;
+        --ag-landing-surface-muted: #edf8f5;
+        --ag-landing-text: #16312e;
+        --ag-landing-heading: #0b2421;
+        --ag-landing-muted: #55716d;
+        --ag-landing-border: #cce4df;
+        --ag-landing-accent: #0f766e;
+        --ag-landing-accent-strong: #0b5f59;
+        --ag-landing-accent-soft: #d9f1eb;
+        --ag-landing-shadow: 0 24px 70px rgb(15 118 110 / 10%);
+        background: var(--ag-landing-bg);
+        color: var(--ag-landing-text);
+    }
+
+    html[data-ag-theme='dark'] .ag-landing {
+        --ag-landing-bg: #102522;
+        --ag-landing-surface: #173430;
+        --ag-landing-surface-muted: #1d403b;
+        --ag-landing-text: #e2f1ed;
+        --ag-landing-heading: #f3fbf8;
+        --ag-landing-muted: #a5c2bc;
+        --ag-landing-border: #315b54;
+        --ag-landing-accent: #65d6c5;
+        --ag-landing-accent-strong: #9be8dc;
+        --ag-landing-accent-soft: #214d46;
+        --ag-landing-shadow: 0 24px 70px rgb(0 0 0 / 24%);
+    }
+
+    .ag-landing-heading { color: var(--ag-landing-heading); }
+    .ag-landing-muted { color: var(--ag-landing-muted); }
+    .ag-landing-border { border-color: var(--ag-landing-border); }
+    .ag-landing-surface { background: var(--ag-landing-surface); }
+    .ag-landing-surface-muted { background: var(--ag-landing-surface-muted); }
+    .ag-landing-accent { color: var(--ag-landing-accent-strong); }
+    .ag-landing-link { color: var(--ag-landing-muted); }
+    .ag-landing-link:hover { color: var(--ag-landing-accent-strong); }
+
+    .ag-landing-kicker {
+        border: 1px solid color-mix(in srgb, var(--ag-landing-accent) 28%, transparent);
+        background: var(--ag-landing-accent-soft);
+        color: var(--ag-landing-accent-strong);
+    }
+
+    .ag-landing-primary { background: var(--ag-landing-accent); color: #fff; }
+    .ag-landing-primary:hover { background: var(--ag-landing-accent-strong); }
+    html[data-ag-theme='dark'] .ag-landing-primary { color: #12332e; }
+
+    .ag-landing-secondary {
+        border: 1px solid var(--ag-landing-border);
+        background: var(--ag-landing-surface);
+        color: var(--ag-landing-heading);
+    }
+
+    .ag-landing-secondary:hover {
+        border-color: var(--ag-landing-accent);
+        color: var(--ag-landing-accent-strong);
+    }
+
+    .ag-landing-preview {
+        border: 1px solid var(--ag-landing-border);
+        background: var(--ag-landing-surface);
+        box-shadow: var(--ag-landing-shadow);
+    }
+
+    .ag-landing-section-alt {
+        border-block: 1px solid var(--ag-landing-border);
+        background: color-mix(in srgb, var(--ag-landing-surface) 62%, var(--ag-landing-bg));
+    }
+
+    .ag-landing-node { border: 1px solid var(--ag-landing-border); background: var(--ag-landing-surface); }
+    .ag-landing-theme { border: 1px solid var(--ag-landing-border); background: var(--ag-landing-surface); color: var(--ag-landing-muted); }
+    .ag-landing-theme[aria-pressed='true'] { background: var(--ag-landing-accent-soft); color: var(--ag-landing-accent-strong); }
+    .ag-landing-reveal { opacity: 1; }
+    .ag-landing-reveal.is-hidden { opacity: 0; transform: translateY(1rem); }
+    .ag-landing-reveal.is-visible { animation: ag-landing-rise 650ms cubic-bezier(.2, .8, .2, 1) both; }
+
+    @keyframes ag-landing-rise {
+        from { opacity: 0; transform: translateY(1rem); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .ag-landing *, .ag-landing-reveal, .ag-landing-reveal.is-visible {
+            animation: none !important;
+            scroll-behavior: auto !important;
+            transition-duration: 0.01ms !important;
+        }
+        .ag-landing-reveal.is-hidden { opacity: 1; transform: none; }
     }
 }
 
@@ -44,6 +188,12 @@
     ::backdrop,
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
+    }
+
+    input:not([type='checkbox']):not([type='radio']):not([type='hidden']),
+    select,
+    textarea {
+        @apply rounded-lg border-zinc-300 bg-white text-zinc-900 shadow-sm focus:border-teal-600 focus:ring-teal-600/25 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-100 dark:focus:border-teal-400 dark:focus:ring-teal-400/25;
     }
 }
 

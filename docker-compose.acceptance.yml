@@ -1,0 +1,60 @@
+services:
+  app:
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "false"
+      APP_URL: http://127.0.0.1:8091
+      DB_DATABASE: aquagrow_acceptance
+      DB_USERNAME: aquagrow_acceptance
+      DB_PASSWORD: ${AQUAGROW_ACCEPTANCE_DB_PASSWORD:?Set the local acceptance database password}
+      SESSION_COOKIE: aquagrow_acceptance_session
+      CACHE_PREFIX: aquagrow_acceptance_
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: log
+    networks: !override [aquagrow-acceptance-internal]
+    volumes:
+      - .:/var/www/html
+      - aquagrow_acceptance_storage:/var/www/html/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  nginx:
+    ports: !override ["127.0.0.1:8091:80"]
+    networks: !override [aquagrow-acceptance-internal]
+    volumes:
+      - .:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+  postgres:
+    environment:
+      POSTGRES_DB: aquagrow_acceptance
+      POSTGRES_USER: aquagrow_acceptance
+      POSTGRES_PASSWORD: ${AQUAGROW_ACCEPTANCE_DB_PASSWORD:?Set the local acceptance database password}
+    networks: !override [aquagrow-acceptance-internal]
+    volumes: [aquagrow_acceptance_postgres_data:/var/lib/postgresql/data]
+
+  redis:
+    networks: !override [aquagrow-acceptance-internal]
+    volumes: [aquagrow_acceptance_redis_data:/data]
+
+  queue-worker:
+    profiles: [disabled-acceptance]
+
+  scheduler:
+    profiles: [disabled-acceptance]
+
+networks:
+  aquagrow-acceptance-internal:
+    name: aquagrow-acceptance-internal
+    driver: bridge
+
+volumes:
+  aquagrow_acceptance_storage:
+    name: aquagrow_acceptance_storage
+  aquagrow_acceptance_postgres_data:
+    name: aquagrow_acceptance_postgres_data
+  aquagrow_acceptance_redis_data:
+    name: aquagrow_acceptance_redis_data

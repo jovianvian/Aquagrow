@@ -36,3 +36,32 @@ queries, enum/positive-value checks, farm-local codes, and the composite
 farm/location foreign key. Manual acceptance must cover owner CRUD, operator
 read-only behavior, farm switching, responsive layout, and keyboard operation.
 Ownership invariant tests must use PostgreSQL and bounded lock timeouts for canonical farm-row locking. Account deletion tests cover sole-owner rejection and successful deletion when every owned farm has another owner.
+## Cultivation verification
+
+Run the standard isolated PostgreSQL test command from the project root:
+
+```text
+./bin/test
+```
+
+Cultivation coverage includes HTTP authorization and tenant isolation, request allowlists and rejected mutation integrity, inactive-species history, derived pond lifecycle, bounded listing-query checks, PostgreSQL constraints, conflict mapping, and two-connection pond-lock concurrency tests. Operator access is read-only. Browser acceptance remains deferred to the combined Cultivation milestone.
+
+## Browser acceptance fixture
+
+The synthetic browser fixture is provisioned only through the guarded CLI
+command below. Run it from an isolated acceptance instance whose active
+PostgreSQL database name contains `acceptance`:
+
+```text
+php artisan acceptance:provision --database=aquagrow_acceptance --marker=SEP07
+```
+
+The command refuses production, `aquagrow`, and `aquagrow_testing`; the value
+must also match the active PostgreSQL connection exactly. Run it only after
+the acceptance instance is configured and its schema is present; the option
+does not switch connections. It creates or reuses only
+records marked for the requested fixture, prompts for a password without
+printing or storing it, and uses the application cycle service for planned,
+active, and cancelled records. It does not migrate, reset, drop, or clean a
+database. Review the printed synthetic emails, farm names, batch codes, and
+URLs before beginning browser acceptance.

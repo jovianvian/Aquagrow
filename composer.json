@@ -37,6 +37,9 @@
         }
     },
     "autoload-dev": {
+        "files": [
+            "phpstan-compat.php"
+        ],
         "psr-4": {
             "Tests\\": "tests/"
         }

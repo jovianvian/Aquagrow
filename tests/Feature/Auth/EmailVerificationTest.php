@@ -4,8 +4,10 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 use Laravel\Fortify\Features;
 use Tests\TestCase;
@@ -28,6 +30,32 @@ class EmailVerificationTest extends TestCase
         $response = $this->actingAs($user)->get(route('verification.notice'));
 
         $response->assertOk();
+    }
+
+    public function test_verification_notification_uses_the_configured_canonical_origin(): void
+    {
+        $user = User::factory()->unverified()->create();
+
+        Notification::fake();
+
+        $this->assertFalse($user->hasVerifiedEmail());
+        $user->sendEmailVerificationNotification();
+
+        Notification::assertSentTo($user, VerifyEmail::class, function (VerifyEmail $notification) use ($user): bool {
+            $generated = parse_url($notification->toMail($user)->actionUrl);
+            $configured = parse_url((string) config('app.url'));
+            $query = [];
+
+            parse_str((string) ($generated['query'] ?? ''), $query);
+
+            $this->assertSame($configured['scheme'] ?? null, $generated['scheme'] ?? null);
+            $this->assertSame($configured['host'] ?? null, $generated['host'] ?? null);
+            $this->assertSame($configured['port'] ?? null, $generated['port'] ?? null);
+            $this->assertArrayHasKey('expires', $query);
+            $this->assertArrayHasKey('signature', $query);
+
+            return true;
+        });
     }
 
     public function test_email_can_be_verified(): void

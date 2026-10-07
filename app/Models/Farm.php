@@ -32,4 +32,10 @@ class Farm extends Model
     {
         return $this->hasMany(Pond::class);
     }
+
+    /** @return HasMany<CultivationCycle, $this> */
+    public function cultivationCycles(): HasMany
+    {
+        return $this->hasMany(CultivationCycle::class);
+    }
 }

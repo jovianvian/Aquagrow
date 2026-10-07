@@ -21,3 +21,12 @@ Location and pond tenant boundaries are enforced by explicit farm-scoped
 queries, policies, and a PostgreSQL composite foreign key. Deletion UI is not
 exposed in this slice; future lifecycle decisions must precede mutation routes.
 Account deletion is blocked while the user is the sole FARM_OWNER of any farm. Membership mutations serialize on the farm row before checking ownership. Multi-farm operations lock farms in ascending ID order. Direct database writes remain outside the application guarantee; future membership endpoints must use the membership service.
+
+Cultivation cycles use the active-farm boundary and owner/operator policies.
+Operators can read cycle history but cannot mutate it. A PostgreSQL partial
+unique index permits at most one planned or active cycle per pond, while the
+pond row is locked before cycle mutations and pond availability changes.
+Composite farm/pond foreign keys prevent cross-farm cycle relationships.
+Known PostgreSQL conflicts become safe domain messages; unknown database errors
+remain internal errors. Inactive species remain readable on historical cycles
+but cannot be used for new stocking.

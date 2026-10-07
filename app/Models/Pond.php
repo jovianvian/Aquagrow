@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\CultivationCycleStatus;
 use App\Enums\PondOperationalStatus;
 use App\Enums\PondType;
 use Database\Factories\PondFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pond extends Model
 {
@@ -21,6 +23,21 @@ class Pond extends Model
         return ['type' => PondType::class, 'operational_status' => PondOperationalStatus::class];
     }
 
+    public function derivedLifecycle(): string
+    {
+        if ($this->getRawOriginal('operational_status') === PondOperationalStatus::MAINTENANCE->value) {
+            return 'MAINTENANCE';
+        }
+        if ($this->getRawOriginal('operational_status') === PondOperationalStatus::INACTIVE->value) {
+            return 'INACTIVE';
+        }
+        $open = $this->relationLoaded('cultivationCycles')
+            ? $this->cultivationCycles->first(fn ($cycle) => in_array($cycle->getRawOriginal('status'), ['PLANNED', 'ACTIVE'], true))
+            : $this->cultivationCycles()->whereIn('status', ['PLANNED', 'ACTIVE'])->first();
+
+        return $open?->getRawOriginal('status') === CultivationCycleStatus::ACTIVE->value ? 'ACTIVE_CULTIVATION' : ($open ? 'CYCLE_PLANNED' : 'EMPTY_AVAILABLE');
+    }
+
     /** @return BelongsTo<Farm, $this> */
     public function farm(): BelongsTo
     {
@@ -31,5 +48,11 @@ class Pond extends Model
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class);
+    }
+
+    /** @return HasMany<CultivationCycle, $this> */
+    public function cultivationCycles(): HasMany
+    {
+        return $this->hasMany(CultivationCycle::class);
     }
 }

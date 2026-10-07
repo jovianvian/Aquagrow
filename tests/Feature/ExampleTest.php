@@ -13,6 +13,12 @@ class ExampleTest extends TestCase
     {
         $response = $this->get(route('home'));
 
-        $response->assertOk();
+        $response->assertOk()
+            ->assertSee('AquaGrow')
+            ->assertSee('A calmer way to run every cultivation cycle.')
+            ->assertSee('Illustrative product preview')
+            ->assertSee('How it works')
+            ->assertSee(route('login'))
+            ->assertSee(route('register'));
     }
 }
